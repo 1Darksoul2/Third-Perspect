@@ -1,0 +1,343 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Third Perspect</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Outfit:wght@400..700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:wght@400;500;600;700&family=Syne:wght@500..800&family=DM+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+
+
+<div class="wrap">
+  <header class="site">
+    <div class="in">
+      <a class="brand" id="brand" href="#home" aria-controls="nav"><i aria-hidden="true"></i><span>Third Perspect</span><em class="chev" aria-hidden="true">&#9662;</em></a>
+      <nav class="nav" id="nav" aria-label="Main">
+        <a href="#home" data-nav="home">Home</a>
+        <a href="#catalog" data-nav="catalog">Catalog</a>
+        <a href="#customize" data-nav="customize">Customize</a>
+        <a href="#about" data-nav="about">About</a>
+        <a href="#contact" data-nav="contact">Contact</a>
+        <div class="menu-extra">
+          <a href="#login" data-nav="login">Log in</a>
+          <a href="#signup" data-nav="signup">Sign up</a>
+          <div class="mx-row"><button class="iconbtn" type="button" data-act="theme">Theme</button><button class="iconbtn" type="button" data-act="font">Font</button></div>
+        </div>
+      </nav>
+      <div class="tools">
+        <button class="iconbtn hide-m" type="button" data-act="font" aria-label="Change font">Aa</button>
+        <button class="iconbtn hide-m" type="button" data-act="theme" aria-label="Switch theme">Theme</button>
+        <a class="iconbtn acct" href="#login" data-nav="login">Log in</a>
+        <button class="iconbtn" id="open-cart" type="button">Cart <b id="cart-count">0</b></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <div class="view" id="view-home">
+      <section class="hero" id="hero">
+        <p class="micro tl">Made small<br>Printed to order<br>Shipped fast</p>
+        <h1 class="hero-title"><span class="w-l">Unbox</span><span class="w-gap">your</span><span class="w-r">unique</span></h1>
+        <div class="fallback" aria-hidden="true"></div>
+        <canvas id="knot" aria-hidden="true"></canvas>
+        <a class="explore" href="#catalog"><span aria-hidden="true">&rarr;</span>Explore<br>the catalog</a>
+        <p class="micro tr">Free shipping<br>over &#8377;999</p>
+        <p class="micro vert">Custom orders open</p>
+        <p class="tagline">3D printed goods and custom orders</p>
+      </section>
+
+      <div class="trust">
+        <div><b>Free shipping</b><span>On orders over &#8377;999</span></div>
+        <div><b>2 to 5 days</b><span>From file check to dispatch</span></div>
+        <div><b>Misprint promise</b><span>Free reprint within 7 days</span></div>
+        <div><b>Secure payment</b><span>Cards, UPI and net banking</span></div>
+      </div>
+
+      <section class="pad">
+        <div class="sec-head"><h2>Shop by category</h2><p>Fifteen collections, all printed in our own studio. Pick one to open the catalog.</p></div>
+        <div class="tiles" id="tiles-home"></div>
+      </section>
+
+      <section class="pad">
+        <div class="sec-head"><h2>Popular picks</h2><a class="btn ghost small" href="#catalog">See everything</a></div>
+        <div class="grid" id="best"></div>
+      </section>
+
+      <section class="pad">
+        <div class="neon">
+          <div class="in">
+            <div>
+              <p class="micro">Custom orders</p>
+              <h2 style="margin-top:12px"><span class="l1">Made</span><span class="l2">for you</span></h2>
+              <p>Bring a 3D file, a sketch or just an idea. Choose material, colour, size and finish, and see a live price before you send it.</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn" href="#customize">Start a custom order</a><a class="btn ghost" href="#about">See past projects</a></div>
+            </div>
+            <div class="cv"><canvas id="teaser" role="img" aria-label="A vase printing layer by layer"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pad">
+        <div class="sec-head"><h2>How a custom order works</h2></div>
+        <ol class="steps">
+          <li><h3>Send your idea</h3><p>Upload a file or describe what you want.</p></li>
+          <li><h3>We review</h3><p>A person checks it and confirms price and time.</p></li>
+          <li><h3>We print</h3><p>Parts go on the bed. You get a photo off the plate.</p></li>
+          <li><h3>It ships</h3><p>Inspected, packed and sent with tracking.</p></li>
+        </ol>
+      </section>
+    </div>
+
+    <!-- CATALOG -->
+    <div class="view" id="view-catalog" hidden>
+      <section class="pad" style="padding-top:44px">
+        <div class="sec-head"><h2>The catalog</h2><p>Browse every design, printed to order. Pick a collection, or search by name.</p></div>
+        <div class="tiles" id="tiles-cat"></div>
+        <div class="chips subs" id="subs" hidden aria-label="Sub-categories"></div>
+        <div class="toolbar">
+          <div class="grp">
+            <label class="micro" for="q">Search</label>
+            <input id="q" type="search" placeholder="Vase, knob, chess...">
+          </div>
+          <div class="grp">
+            <span class="micro" id="count" aria-live="polite"></span>
+            <label class="micro" for="sort">Sort</label>
+            <select id="sort"><option value="feat">Featured</option><option value="lo">Price, low to high</option><option value="hi">Price, high to low</option><option value="az">Name A to Z</option></select>
+          </div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="more" id="more"></div>
+      </section>
+    </div>
+
+    <!-- CUSTOMIZE -->
+    <div class="view" id="view-customize" hidden>
+      <section style="margin-top:22px">
+        <div class="neon">
+          <div class="in">
+            <div>
+              <p class="micro">Custom order studio</p>
+              <h1 style="margin-top:12px"><span class="l1">Design</span><span class="l2">your dream</span></h1>
+              <p>Set the size, material, colour and finish. The price updates as you go, and a person confirms it before anything is printed.</p>
+            </div>
+            <div class="note" style="color:#C9C3E6">Prices shown are estimates for planning. We review your file and send a final quote within one working day.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="cust">
+        <form id="cform" novalidate>
+          <fieldset class="fs">
+            <legend>1. Your model</legend>
+            <div class="field full"><label class="l" for="c-file">Upload a file (STL, 3MF, STEP, OBJ)</label><input id="c-file" type="file" accept=".stl,.3mf,.step,.stp,.obj,.png,.jpg,.jpeg,.pdf"></div>
+            <p class="note" style="margin:10px 0 14px">No file yet? Describe it below and pick a stand-in shape for the preview. Sketches and photos are fine.</p>
+            <div class="chips" id="c-shape" role="group" aria-label="Preview shape"></div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>2. Material and colour</legend>
+            <div class="two">
+              <div class="field"><label class="l" for="c-mat">Material</label>
+                <select id="c-mat"><option>PLA</option><option>PETG</option><option>ABS / ASA</option><option>Nylon</option><option>TPU</option><option>Resin</option></select></div>
+              <div class="field"><label class="l" id="c-col-l">Colour: <span id="c-col-n">Aqua</span></label><div class="chips" id="c-col" role="group" aria-labelledby="c-col-l"></div></div>
+            </div>
+            <p class="note" id="c-mat-note" style="margin-top:12px"></p>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>3. Size and detail</legend>
+            <div class="field"><label class="l" for="c-size">Longest side</label>
+              <div class="range"><input id="c-size" type="range" min="20" max="300" step="5" value="120"><output id="c-size-o" for="c-size">120 mm</output></div></div>
+            <div class="two" style="margin-top:16px">
+              <div class="field"><label class="l" for="c-qual">Print quality</label>
+                <select id="c-qual"><option>Draft</option><option selected>Standard</option><option>Fine</option><option>Ultra</option></select></div>
+              <div class="field"><label class="l" for="c-fill">Strength</label>
+                <select id="c-fill"><option>Light</option><option selected>Standard</option><option>Solid</option></select></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>4. Finish and quantity</legend>
+            <div class="two">
+              <div class="field"><label class="l" for="c-fin">Finish</label>
+                <select id="c-fin"><option>Raw</option><option>Sanded</option><option>Primed &amp; painted</option></select></div>
+              <div class="field"><label class="l" for="c-qty">Quantity</label><input id="c-qty" type="number" min="1" max="500" value="1"></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>5. Your details</legend>
+            <div class="two">
+              <div class="field"><label class="l" for="c-name">Name</label><input id="c-name" type="text" autocomplete="name"></div>
+              <div class="field"><label class="l" for="c-email">Email</label><input id="c-email" type="email" autocomplete="email"></div>
+              <div class="field"><label class="l" for="c-phone">Phone</label><input id="c-phone" type="tel" autocomplete="tel"></div>
+              <div class="field"><label class="l" for="c-date">Needed by</label><input id="c-date" type="date"></div>
+              <div class="field full"><label class="l" for="c-notes">Tell us about it</label><textarea id="c-notes" rows="4" placeholder="What is it for? Any tolerances, text to engrave, logos, colours?"></textarea></div>
+            </div>
+            <div style="margin-top:18px"><button class="btn" type="submit">Request my quote</button></div>
+            <p class="status" id="c-status" role="status"></p>
+          </fieldset>
+        </form>
+
+        <aside class="preview" aria-label="Preview and estimate">
+          <div class="cv"><canvas id="c-canvas" role="img" aria-label="Preview of your custom part"></canvas></div>
+          <dl class="bill" id="bill"></dl>
+          <div class="total"><span class="micro">Estimate</span><strong id="c-total">0</strong></div>
+          <p class="note" id="c-range"></p>
+          <p class="note" id="c-lead" style="margin-top:6px"></p>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="view" id="view-about" hidden>
+      <section class="about-hero">
+        <p class="micro" style="margin-bottom:22px">About Third Perspect</p>
+        <h1 class="blurry" data-t="Small batches, big care">Small batches, big care</h1>
+        <p>We are a 3D printing studio that sells a growing catalog and takes on custom jobs. Every part is checked by hand, printed in our own workshop and packed by the same people who answer your emails.</p>
+      </section>
+
+      <div class="stats">
+        <div><strong>4 yrs</strong><span class="micro">In the workshop</span></div>
+        <div><strong>12k+</strong><span class="micro">Parts printed</span></div>
+        <div><strong>18</strong><span class="micro">Printers running</span></div>
+        <div><strong>98%</strong><span class="micro">Orders right first time</span></div>
+      </div>
+
+      <section class="pad">
+        <div class="cols3">
+          <div><h3>We check every file</h3><p>Thin walls, bad overhangs and wrong scale cause most failed prints. We catch them before they cost you money.</p></div>
+          <div><h3>We print what we sell</h3><p>No dropshipping. The vase in your cart is printed on our machines, from filament we choose and test.</p></div>
+          <div><h3>We stay reachable</h3><p>Call, email or message. You talk to the person who is holding your part.</p></div>
+        </div>
+      </section>
+
+      <section class="pad" id="projects">
+        <div class="sec-head"><h2>Previous projects</h2><p>A few jobs from the workshop. Replace these with your own case studies and photos.</p></div>
+        <div class="chips" id="proj-filter" role="group" aria-label="Filter projects" style="margin-bottom:24px"></div>
+        <div class="projects" id="projects-grid"></div>
+        <div style="margin-top:34px"><a class="btn" href="#customize">Start your own project</a></div>
+      </section>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="view" id="view-contact" hidden>
+      <section class="pad" style="padding-top:44px">
+        <div class="sec-head"><h2>Contact us</h2><p>Questions about an order, a bulk quote or a design you are stuck on. We reply within one working day.</p></div>
+        <div class="contact">
+          <div class="info">
+            <p class="micro">Email</p><p class="v">hello@yourcompany.com</p>
+            <p class="micro">Phone and WhatsApp</p><p class="v">+00 00000 00000</p>
+            <p class="micro">Workshop</p><p class="v">Your workshop address, city, PIN</p>
+            <p class="micro">Hours</p><p class="v">Mon to Sat, 9:30 to 18:30</p>
+          </div>
+          <form id="kform" novalidate>
+            <div class="two">
+              <div class="field"><label class="l" for="k-name">Name</label><input id="k-name" type="text" autocomplete="name"></div>
+              <div class="field"><label class="l" for="k-email">Email</label><input id="k-email" type="email" autocomplete="email"></div>
+              <div class="field full"><label class="l" for="k-topic">Topic</label>
+                <select id="k-topic"><option>Order help</option><option>Bulk or business quote</option><option>Custom design</option><option>Returns and reprints</option><option>Something else</option></select></div>
+              <div class="field full"><label class="l" for="k-msg">Message</label><textarea id="k-msg" rows="5"></textarea></div>
+            </div>
+            <div style="margin-top:18px"><button class="btn" type="submit">Send message</button></div>
+            <p class="status" id="k-status" role="status"></p>
+          </form>
+        </div>
+      </section>
+      <section class="pad">
+        <div class="sec-head"><h2>Good to know</h2></div>
+        <details open><summary>How long does an order take?</summary><p>Catalog items ship in 2 to 5 working days. Custom orders depend on size and quantity, and the quote shows an estimate.</p></details>
+        <details><summary>Which files can I send?</summary><p>STL, 3MF, STEP and OBJ work best. Sketches and photos are fine too, and we can model them for an hourly fee.</p></details>
+        <details><summary>What if my part prints wrong?</summary><p>If a print has a fault that is ours, we reprint it free within 7 days of delivery.</p></details>
+        <details><summary>Do you ship across the country?</summary><p>Yes. Shipping is free over &#8377;999, and bulk orders can be sent by freight.</p></details>
+      </section>
+    </div>
+    <!-- LOGIN -->
+    <div class="view" id="view-login" hidden>
+      <section class="auth">
+        <aside class="auth-art">
+          <i class="biglogo" aria-hidden="true"></i>
+          <div>
+            <p class="art-tag">Unbox your unique</p>
+            <ul class="perks">
+              <li>Track every order from print to doorstep</li>
+              <li>Save your designs and reorder in one tap</li>
+              <li>Keep all your quotes and updates in one place</li>
+            </ul>
+          </div>
+        </aside>
+        <div class="auth-card">
+          <div><p class="micro">Welcome back</p><h1>Log in</h1></div>
+          <form id="lform" novalidate>
+            <div class="field"><label class="l" for="l-email">Email</label><input id="l-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+            <div class="field"><label class="l" for="l-pass">Password</label><div class="pw"><input id="l-pass" type="password" autocomplete="current-password"><button type="button" class="linkbtn" data-toggle="l-pass">Show</button></div></div>
+            <div class="row-between"><label class="check"><input id="l-rem" type="checkbox"> Keep me signed in</label><button type="button" class="linkbtn" id="forgot">Forgot password?</button></div>
+            <button class="btn" type="submit" style="justify-content:center">Log in</button>
+            <p class="status" id="l-status" role="status"></p>
+          </form>
+          <p class="switch">New to Third Perspect? <a href="#signup">Create an account</a></p>
+        </div>
+      </section>
+    </div>
+
+    <!-- SIGN UP -->
+    <div class="view" id="view-signup" hidden>
+      <section class="auth">
+        <aside class="auth-art">
+          <i class="biglogo" aria-hidden="true"></i>
+          <div>
+            <p class="art-tag">Design your dream</p>
+            <ul class="perks">
+              <li>Free account, no card needed</li>
+              <li>Faster checkout with saved details</li>
+              <li>Early access to new drops and offers</li>
+            </ul>
+          </div>
+        </aside>
+        <div class="auth-card">
+          <div><p class="micro">Join us</p><h1>Create account</h1></div>
+          <form id="sform" novalidate>
+            <div class="two">
+              <div class="field"><label class="l" for="s-name">Full name</label><input id="s-name" type="text" autocomplete="name"></div>
+              <div class="field"><label class="l" for="s-phone">Phone (optional)</label><input id="s-phone" type="tel" autocomplete="tel"></div>
+              <div class="field full"><label class="l" for="s-email">Email</label><input id="s-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+              <div class="field"><label class="l" for="s-pass">Password</label><div class="pw"><input id="s-pass" type="password" autocomplete="new-password"><button type="button" class="linkbtn" data-toggle="s-pass">Show</button></div>
+                <div class="meter" aria-hidden="true"><i id="s-meter"></i></div><span class="note" id="s-meter-t">Use 8 or more characters with a number.</span></div>
+              <div class="field"><label class="l" for="s-pass2">Confirm password</label><div class="pw"><input id="s-pass2" type="password" autocomplete="new-password"><button type="button" class="linkbtn" data-toggle="s-pass2">Show</button></div></div>
+            </div>
+            <label class="check"><input id="s-terms" type="checkbox"> I agree to the terms and privacy policy</label>
+            <button class="btn" type="submit" style="justify-content:center">Create my account</button>
+            <p class="status" id="s-status" role="status"></p>
+          </form>
+          <p class="switch">Already have an account? <a href="#login">Log in</a></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div><a class="brand" href="#home"><i aria-hidden="true"></i>Third Perspect</a><p class="note" style="margin-top:12px;max-width:30ch">3D printed goods and custom orders, made in small batches.</p></div>
+    <div><h4 class="micro">Shop</h4><ul><li><a href="#catalog">Catalog</a></li><li><a href="#customize">Custom orders</a></li></ul></div>
+    <div><h4 class="micro">Company</h4><ul><li><a href="#about">About us</a></li><li><a href="#contact">Contact us</a></li><li><a href="#login">Log in</a></li><li><a href="#signup">Sign up</a></li></ul></div>
+    <div><h4 class="micro">Get new drops</h4><form class="news" id="nform" novalidate><input id="n-email" type="email" placeholder="Your email" aria-label="Email for newsletter"><button class="btn small" type="submit">Join</button></form><p class="status" id="n-status" role="status"></p></div>
+    <div class="legal micro"><span>&copy; Third Perspect 3D Printing</span><span>Instagram &middot; YouTube &middot; WhatsApp</span></div>
+  </footer>
+</div>
+
+<div id="scrim" class="scrim" hidden></div>
+<aside id="drawer" class="drawer" hidden aria-label="Cart">
+  <header><h2>Your cart</h2><button class="iconbtn" id="close-cart" type="button">Close</button></header>
+  <div class="items" id="items"></div>
+  <div class="ship" id="ship"></div>
+  <div class="sub"><span>Subtotal</span><span id="subtotal">&#8377;0</span></div>
+  <button class="btn" id="checkout" type="button">Checkout</button>
+  <p class="status" id="co-status" role="status"></p>
+</aside>
+<div id="modal" class="modal" hidden><div class="sheet" role="dialog" aria-modal="true" aria-label="Product details" id="sheet"></div></div>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+
+</body></html>
