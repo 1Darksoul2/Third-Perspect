@@ -97,14 +97,14 @@
   function cById(id) { return C_BY_ID[id]; }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
   /* a real photo sits on top of the drawn placeholder; if the file is missing it removes itself */
-  function shot(p) { return window.SHOP && SHOP.useImages && p.img ? '<img class="shot" src="' + SHOP.imageBase + p.img + '" alt="' + esc(p.n) + '" loading="lazy">' : ""; }
+  function shot(p) { return p.img && (p.imgs || (window.SHOP && SHOP.useImages)) ? '<img class="shot" src="' + SHOP.imageBase + p.img + '" alt="' + esc(p.n) + '" loading="lazy">' : ""; }
   document.addEventListener("error", function (e) { if (e.target && e.target.classList && e.target.classList.contains("shot")) e.target.remove(); }, true);
   function withShot(html, p) { return html.replace(/<\/div>$/, shot(p) + "</div>"); }
   function publicProducts() { return PRODUCTS.filter(function (p) { return !cById(p.cat).adult; }); }
 
   function tilesHTML(selectable) {
     var all = selectable ? '<button class="tile" type="button" data-cat="all" aria-pressed="' + (state.cat === "all") + '"><div><p class="micro">' + publicProducts().length + ' items</p><h3>Everything</h3><p>The full collection</p></div>' + cvHTML("vase", [196, 70, 56], .9, 40) + "</button>" : "";
-    return all + CATS.map(function (c) {
+    return all + CATS.filter(function (c) { return PRODUCTS.some(function (p) { return p.cat === c.id; }); }).map(function (c) {
       var n = PRODUCTS.filter(function (p) { return p.cat === c.id; }).length;
       return '<button class="tile" type="button" data-cat="' + c.id + '" aria-pressed="' + (selectable && state.cat === c.id) + '"><div><p class="micro">' + n + ' items' + (c.adult ? ", 18+" : "") + '</p><h3>' + c.n + "</h3><p>" + c.d + "</p></div>" + cvHTML(c.prof, c.c, .9, 40) + "</button>";
     }).join("");
@@ -154,7 +154,8 @@
   function renderTiles() {
     $("#tiles-cat").innerHTML = tilesHTML(true);
     $("#tiles-home").innerHTML = tilesHTML(false);
-    $("#best").innerHTML = publicProducts().filter(function (p) { return p.flag === "Popular"; }).slice(0, 4).map(cardHTML).join("");
+    var pub = publicProducts(), pop = pub.filter(function (p) { return p.flag === "Popular"; });
+    $("#best").innerHTML = pop.concat(pub.filter(function (p) { return p.flag !== "Popular"; })).slice(0, 4).map(cardHTML).join("");
     drawAll();
   }
 
@@ -186,10 +187,16 @@
 
   /* ---------- product modal ---------- */
   var mcur = null;
+  function thumbsHTML(p) {
+    if (!p.imgs || p.imgs.length < 2) return "";
+    return '<div class="thumbs" role="group" aria-label="Photos">' + p.imgs.map(function (src, i) {
+      return '<button type="button" class="thumb" data-thumb="' + esc(src) + '" aria-label="Photo ' + (i + 1) + ' of ' + p.imgs.length + '" aria-pressed="' + (i === 0) + '"><img src="' + SHOP.imageBase + esc(src) + '" alt="" loading="lazy"></button>';
+    }).join("") + "</div>";
+  }
   function openModal(id) {
     var p = pById(id); mcur = { id: id, color: p.col, size: 1, qty: 1 };
     $("#sheet").innerHTML =
-      '<div class="left">' + withShot(cvHTML(p.prof, COLORS[p.col].c, SIZES[1].s, 80).replace('<canvas', '<canvas id="m-cv"'), p) + "</div>" +
+      '<div class="left">' + withShot(cvHTML(p.prof, COLORS[p.col].c, SIZES[1].s, 80).replace('<canvas', '<canvas id="m-cv"'), p) + thumbsHTML(p) + "</div>" +
       '<div class="right"><button class="iconbtn close" type="button" id="m-close">Close</button><span class="micro">' + cById(p.cat).n + (p.sub ? ", " + p.sub : "") + "</span><h2>" + esc(p.n) + "</h2>" +
       '<p style="color:var(--muted)">' + p.d + '</p><div class="meta micro"><span>' + p.mat + "</span><span>Print time " + p.t + "</span><span>Ships in 2 to 5 days</span></div>" +
       '<div><p class="micro" style="margin-bottom:8px">Colour: <span id="m-cn"></span></p><div class="chips" id="m-cols">' + COLORS.map(function (c, i) { return '<button class="sw" type="button" style="--c:' + hsl(c.c, 0) + '" data-mc="' + i + '" aria-label="' + c.n + '" aria-pressed="' + (i === p.col) + '"></button>'; }).join("") + "</div></div>" +
@@ -408,6 +415,7 @@
     var card = t.closest(".pcard"); if (card) { openModal(card.dataset.id); return; }
     if (t.closest("#open-cart")) { openCart(); return; }
     if (t.closest("#close-cart") || t.closest("#m-close") || t.id === "scrim") { closeAll(); return; }
+    var th = t.closest("[data-thumb]"); if (th) { var main = $("#sheet .left .shot"); if (main) main.src = SHOP.imageBase + th.dataset.thumb; $$("[data-thumb]").forEach(function (b) { b.setAttribute("aria-pressed", b === th); }); return; }
     var mc = t.closest("[data-mc]"); if (mc) { mcur.color = +mc.dataset.mc; modalUpdate(); return; }
     var ms = t.closest("[data-ms]"); if (ms) { mcur.size = +ms.dataset.ms; modalUpdate(); return; }
     if (t.closest("#m-add")) { addToCart(mcur.id, { color: mcur.color, size: mcur.size }); closeAll(); openCart(); return; }
