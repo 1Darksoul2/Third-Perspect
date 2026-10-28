@@ -304,8 +304,8 @@
       g.fillStyle = "rgba(255,255,255,.96)"; g.fillRect(110, 80, 90, 160); g.fillRect(430, 50, 170, 64); g.fillRect(770, 100, 70, 180);
       g.fillStyle = "rgba(255,150,50,.9)"; g.fillRect(620, 190, 120, 42); g.fillStyle = "rgba(100,200,255,.85)"; g.fillRect(260, 210, 90, 36);
       var env = new T.CanvasTexture(ec); env.mapping = T.EquirectangularReflectionMapping; env.encoding = T.sRGBEncoding;
-      var chrome = new T.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: .12, envMap: env, envMapIntensity: 1.3 });
-      var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: .25, roughness: .42, envMap: env, envMapIntensity: .45 });
+      var chrome = new T.MeshStandardMaterial({ color: 0xffffff, metalness: .6, roughness: .5, envMap: env, envMapIntensity: .55 });
+      var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: 0, roughness: .85, envMap: env, envMapIntensity: .1 });
       var R = 1.2, H = .22, group = new T.Group();
       var rim = new T.Mesh(new T.CylinderGeometry(R, R, H, 96, 1, true), chrome); rim.rotation.x = Math.PI / 2; group.add(rim);
       var tg = new T.TorusGeometry(R, .08, 24, 120);
@@ -316,7 +316,7 @@
       var back = new T.Mesh(dg, face); back.position.z = -H / 2 - .003; back.rotation.y = Math.PI; group.add(back);
       scene.add(group);
       scene.add(new T.AmbientLight(0xffffff, .95));
-      var dl = new T.DirectionalLight(0xffffff, .9); dl.position.set(2, 3, 5); scene.add(dl);
+      var dl = new T.DirectionalLight(0xffffff, .5); dl.position.set(2, 3, 5); scene.add(dl);
       new T.TextureLoader().load(LOGO_HI, function (lt) {
         lt.encoding = T.sRGBEncoding; lt.anisotropy = renderer.capabilities.getMaxAnisotropy();
         face.map = lt; face.color.set(0xffffff); face.needsUpdate = true;
