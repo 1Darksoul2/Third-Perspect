@@ -144,6 +144,13 @@
     $("#more").innerHTML = left > 0 ? '<button class="btn ghost" type="button" data-more="1">Show ' + Math.min(PAGE, left) + " more (" + left + " left)</button>" : "";
     drawAll($("#grid"));
   }
+  function renderCatHead() {
+    var cat = state.cat === "all" ? null : cById(state.cat);
+    $("#tiles-cat").hidden = !!cat;
+    $("#cat-back").hidden = !cat;
+    $("#cat-title").textContent = cat ? cat.n : "The catalog";
+    $("#cat-desc").textContent = cat ? cat.d + "." : "Browse every design, printed to order. Pick a collection, or search by name.";
+  }
   function renderTiles() {
     $("#tiles-cat").innerHTML = tilesHTML(true);
     $("#tiles-home").innerHTML = tilesHTML(false);
@@ -203,17 +210,15 @@
 
   /* ---------- customize: a request form, no automatic price ---------- */
   var MATS = window.MATERIALS || [], QUALS = window.QUALITIES || [], CCOLS = window.CUSTOM_COLORS || [];
-  var SHAPES = [["vase", "Vase"], ["pawn", "Chess piece"], ["knob", "Knob"], ["tower", "Tower"], ["drop", "Pendant"]];
   var MAX_MB = (window.SHOP && SHOP.maxUploadMB) || 50, MAX_FILES = (window.SHOP && SHOP.maxFiles) || 5;
   var EXT3D = ["stl", "obj", "3mf", "glb", "step", "stp"], EXTIMG = ["png", "jpg", "jpeg"];
   var firstMat = MATS.filter(function (m) { return m.available === true; })[0];
-  var cust = { shape: "vase", color: 0, qual: QUALS.length ? QUALS[0].id : "", mat: firstMat ? firstMat.id : "", files: [] };
+  var cust = { color: 0, qual: QUALS.length ? QUALS[0].id : "", mat: firstMat ? firstMat.id : "", files: [] };
   function availText(a) { return a === true ? "Available" : a === "request" ? "On request, confirmed after review" : "Currently unavailable"; }
   function cardHTML2(group, id, title, body, checked, disabled, extra) {
     return '<label class="opt' + (disabled ? " off" : "") + '"><input type="radio" name="' + group + '" value="' + esc(id) + '"' + (checked ? " checked" : "") + (disabled ? " disabled" : "") + '><span class="opt-b"><b>' + esc(title) + "</b>" + body + (extra || "") + "</span></label>";
   }
   function buildCustomizer() {
-    $("#c-shape").innerHTML = SHAPES.map(function (s) { return '<button class="chip" type="button" data-shape="' + s[0] + '" aria-pressed="' + (s[0] === cust.shape) + '">' + s[1] + "</button>"; }).join("");
     $("#c-qual").innerHTML = QUALS.map(function (q) {
       return cardHTML2("quality", q.id, q.n, "<span>" + esc(q.d) + '</span><span class="note">' + esc(q.trade) + "</span>", q.id === cust.qual, false);
     }).join("");
@@ -230,15 +235,9 @@
   }
   function custUpdate() {
     var size = +$("#c-size").value, col = CCOLS[cust.color];
-    var qty = Math.max(1, Math.min(500, parseInt($("#c-qty").value, 10) || 1));
     $("#c-size-o").textContent = size + " mm";
     if (col) { $("#c-col-n").textContent = col.n; $("#c-col-s").textContent = col.stock ? "(in stock)" : "(on request)"; }
-    $$("[data-shape]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.shape === cust.shape); });
     $$("[data-cc]").forEach(function (b) { var on = +b.dataset.cc === cust.color; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
-    var m = MATS.filter(function (x) { return x.id === cust.mat; })[0];
-    var rows = [["Model", $("#c-model").value.trim() || "Not named yet"], ["Files", cust.files.length ? cust.files.length + " selected" : "None yet"], ["Quality", cust.qual || "-"], ["Material", m ? m.n : "-"], ["Colour", col ? col.n : "-"], ["Size", size + " mm, " + $("#c-fin").value], ["Quantity", qty]];
-    $("#c-summary").innerHTML = rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("");
-    if (col) drawObj($("#c-canvas"), P[cust.shape], { layers: 90, c: col.c, scale: .4 + .6 * (size / 300) });
   }
   function extOf(name) { var i = name.lastIndexOf("."); return i < 0 ? "" : name.slice(i + 1).toLowerCase(); }
   function fmtSize(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; }
@@ -300,14 +299,19 @@
   /* ---------- routing ---------- */
   var VIEWS = ["home", "catalog", "customize", "about", "contact", "login", "signup"];
   function route() {
-    var h = (location.hash || "#home").slice(1);
+    var parts = (location.hash || "#home").slice(1).split("/"), h = parts[0];
     if (VIEWS.indexOf(h) < 0) h = "home";
+    if (h === "catalog") {
+      /* #catalog shows every collection; #catalog/<id> shows that collection only */
+      var want = parts[1] && cById(parts[1]) ? parts[1] : "all";
+      if (want !== state.cat) { state.cat = want; state.sub = "All"; state.shown = PAGE; }
+    }
     state.view = h;
     VIEWS.forEach(function (v) { $("#view-" + v).hidden = v !== h; });
     $$("[data-nav]").forEach(function (a) { if (a.dataset.nav === h) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     closeAll(); setMenu(false);
     window.scrollTo(0, 0);
-    if (h === "catalog") { $$("[data-cat]", $("#tiles-cat")).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === state.cat); }); renderGrid(); }
+    if (h === "catalog") { $$("[data-cat]", $("#tiles-cat")).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === state.cat); }); renderCatHead(); renderGrid(); }
     requestAnimationFrame(function () { drawAll(); if (h === "customize") custUpdate(); if (h === "home") knotResize(); });
   }
 
@@ -330,7 +334,7 @@
       g.fillStyle = "rgba(255,255,255,.96)"; g.fillRect(110, 80, 90, 160); g.fillRect(430, 50, 170, 64); g.fillRect(770, 100, 70, 180);
       g.fillStyle = "rgba(255,150,50,.9)"; g.fillRect(620, 190, 120, 42); g.fillStyle = "rgba(100,200,255,.85)"; g.fillRect(260, 210, 90, 36);
       var env = new T.CanvasTexture(ec); env.mapping = T.EquirectangularReflectionMapping; env.encoding = T.sRGBEncoding;
-      var chrome = new T.MeshStandardMaterial({ color: 0xffffff, metalness: .6, roughness: .5, envMap: env, envMapIntensity: .55 });
+      var chrome = new T.MeshStandardMaterial({ color: 0x2b2420, metalness: .5, roughness: .45, envMap: env, envMapIntensity: .4 });
       var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: 0, roughness: .85, envMap: env, envMapIntensity: .1 });
       var R = 1.2, H = .22, group = new T.Group();
       var rim = new T.Mesh(new T.CylinderGeometry(R, R, H, 96, 1, true), chrome); rim.rotation.x = Math.PI / 2; group.add(rim);
@@ -398,20 +402,19 @@
     var sb = t.closest("[data-sub]"); if (sb) { state.sub = sb.dataset.sub; state.shown = PAGE; renderGrid(); return; }
     if (t.closest("[data-more]")) { state.shown += PAGE; renderGrid(); return; }
     var ag = t.closest("[data-age]");
-    if (ag) { if (ag.dataset.age === "yes") { state.adult = true; try { sessionStorage.setItem("tp-adult", "1"); } catch (e) {} renderGrid(); } else { state.cat = "all"; state.sub = "All"; route(); } return; }
+    if (ag) { if (ag.dataset.age === "yes") { state.adult = true; try { sessionStorage.setItem("tp-adult", "1"); } catch (e) {} renderGrid(); } else { location.hash = "#catalog"; } return; }
     var add = t.closest("[data-add]"); if (add) { e.stopPropagation(); addToCart(add.dataset.add); return; }
-    var tile = t.closest("[data-cat]"); if (tile) { state.cat = tile.dataset.cat; state.sub = "All"; state.shown = PAGE; if (state.view === "catalog") route(); else location.hash = "#catalog"; return; }
+    var tile = t.closest("[data-cat]"); if (tile) { location.hash = tile.dataset.cat === "all" ? "#catalog" : "#catalog/" + tile.dataset.cat; return; }
     var card = t.closest(".pcard"); if (card) { openModal(card.dataset.id); return; }
     if (t.closest("#open-cart")) { openCart(); return; }
     if (t.closest("#close-cart") || t.closest("#m-close") || t.id === "scrim") { closeAll(); return; }
     var mc = t.closest("[data-mc]"); if (mc) { mcur.color = +mc.dataset.mc; modalUpdate(); return; }
     var ms = t.closest("[data-ms]"); if (ms) { mcur.size = +ms.dataset.ms; modalUpdate(); return; }
     if (t.closest("#m-add")) { addToCart(mcur.id, { color: mcur.color, size: mcur.size }); closeAll(); openCart(); return; }
-    if (t.closest("#m-cust")) { var pr = pById(mcur.id); cust.shape = SHAPES.some(function (s) { return s[0] === pr.prof; }) ? pr.prof : cust.shape; closeAll(); location.hash = "#customize"; setTimeout(buildCustomizer, 0); return; }
+    if (t.closest("#m-cust")) { closeAll(); location.hash = "#customize"; setTimeout(buildCustomizer, 0); return; }
     var inc = t.closest("[data-inc]"); if (inc) { state.cart[+inc.dataset.inc].q++; saveCart(); renderCart(); return; }
     var dec = t.closest("[data-dec]"); if (dec) { var it = state.cart[+dec.dataset.dec]; it.q--; if (it.q < 1) state.cart.splice(+dec.dataset.dec, 1); saveCart(); renderCart(); return; }
     var rm = t.closest("[data-rm]"); if (rm) { state.cart.splice(+rm.dataset.rm, 1); saveCart(); renderCart(); return; }
-    var sh = t.closest("[data-shape]"); if (sh) { cust.shape = sh.dataset.shape; custUpdate(); return; }
     var cc = t.closest("[data-cc]"); if (cc) { cust.color = +cc.dataset.cc; custUpdate(); return; }
     var rf = t.closest("[data-rmfile]"); if (rf) { cust.files.splice(+rf.dataset.rmfile, 1); renderFiles(); custUpdate(); $("#c-file").focus(); return; }
     var pf = t.closest("[data-pf]"); if (pf) { state.proj = pf.dataset.pf; renderProjects(); return; }
@@ -431,7 +434,7 @@
 
   $("#q").addEventListener("input", function (e) { state.q = e.target.value.trim().toLowerCase(); state.shown = PAGE; renderGrid(); });
   $("#sort").addEventListener("change", function (e) { state.sort = e.target.value; state.shown = PAGE; renderGrid(); });
-  ["c-size", "c-fill", "c-fin", "c-qty", "c-model"].forEach(function (id) { $("#" + id).addEventListener("input", custUpdate); $("#" + id).addEventListener("change", custUpdate); });
+  ["c-size", "c-fill", "c-fin", "c-qty"].forEach(function (id) { $("#" + id).addEventListener("input", custUpdate); $("#" + id).addEventListener("change", custUpdate); });
   $("#cform").addEventListener("change", function (e) {
     if (e.target.name === "quality") { cust.qual = e.target.value; custUpdate(); }
     if (e.target.name === "material") { cust.mat = e.target.value; custUpdate(); }
@@ -470,7 +473,6 @@
     fd.append("quality", cust.qual); fd.append("material", cust.mat);
     fd.append("colour", CCOLS[cust.color] ? CCOLS[cust.color].n : "");
     fd.append("colourInStock", CCOLS[cust.color] && CCOLS[cust.color].stock ? "yes" : "no");
-    fd.append("previewShape", cust.shape);
     cust.files.forEach(function (x) { fd.append("files", x.file, x.file.name); x.status = "Uploading..."; });
     renderFiles();
     var btn = $("#c-submit"); btn.disabled = true;
