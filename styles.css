@@ -545,3 +545,12 @@ h1, h2, h3, h4, summary, .brand, .trust b, .tile h3, .pbody h3, .stats strong, .
   .neon h1, .neon h2 { font-size: calc(clamp(40px, 13vw, 56px) * var(--hs)); }
   footer { gap: 24px; margin-top: 64px; }
 }
+
+/* product photos: the modal shows thumbnails when a product has several */
+.sheet .left { display: grid; gap: 12px; align-content: start; }
+.thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.thumb { width: 64px; height: 64px; padding: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface2); cursor: pointer; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.thumb:hover { border-color: var(--fg); }
+.sheet .right > .micro { padding-right: 84px; }
