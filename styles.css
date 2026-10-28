@@ -30,6 +30,7 @@
     color-scheme: dark;
     /* hero, neon band and overlay colours */
     --k-ring: rgba(255, 241, 214, .25);
+    --k-rim: #2b2420;
     --k1: rgba(10, 8, 6, 0);
     --k2: rgba(10, 8, 6, .5);
     --k3: #1B7FA6;
@@ -484,3 +485,63 @@ label.btn { cursor: pointer; }
 /* catalog: back link when one collection is open */
 .back { display: inline-block; margin-bottom: 16px; font-size: 15px; color: var(--fg); }
 .back:hover { color: var(--accent); }
+
+/* bolder type */
+body { font-weight: 500; }
+h1, h2, h3, h4, summary, .brand, .trust b, .tile h3, .pbody h3, .stats strong, .total strong, .info .v, .item h4, .art-tag { font-weight: 700; }
+.hero-title, .neon h1, .neon h2, .blurry { font-weight: 800; }
+.nav a, .iconbtn, .btn, .chip, label.l, .fs legend, .price { font-weight: 600; }
+.note, .micro, .sec-head p, .tile p { font-weight: 500; }
+/* the 3D-less fallback coin gets the same dark edge as the 3D rim */
+.fallback { box-shadow: 0 0 0 6px var(--k-rim); }
+
+/* phone layout */
+@media (max-width: 600px) {
+  .pad { padding-block: 48px 0; }
+  .sec-head { margin-bottom: 20px; }
+  .sec-head h2 { font-size: calc(clamp(30px, 9vw, 40px) * var(--hs)); }
+
+  /* categories: one compact row each, name and count beside a small icon */
+  .tiles { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .tile { grid-template-columns: minmax(0, 1fr) 56px; align-items: center; min-height: 0; padding: 14px 16px; gap: 12px; }
+  .tile h3 { font-size: 19px; margin: 2px 0 0; line-height: 1.2; }
+  .tile p:not(.micro) { display: none; }
+  .tile .cv { width: 56px; }
+
+  /* catalog toolbar: search full width, count and sort on one line */
+  .toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
+  .toolbar .grp { width: 100%; }
+  .toolbar .grp:first-child label { display: none; }
+  .toolbar input { width: 100%; }
+  .toolbar .grp:last-child { justify-content: space-between; }
+  .toolbar .grp:last-child select { flex: 1; min-width: 0; }
+
+  /* product cards: same height rows, price then a full-width button */
+  .grid { gap: 20px 12px; }
+  .pcard { gap: 8px; }
+  .pimg { flex: none; }
+  .pbody { display: flex; flex-direction: column; flex: 1 1 auto; }
+  .pbody h3 { font-size: 16px; line-height: 1.25; margin: 2px 0 8px; min-height: 2.5em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .prow { flex-direction: column; align-items: stretch; gap: 8px; margin-top: auto; }
+  .prow .price { font-size: 17px; }
+  .prow .btn { justify-content: center; width: 100%; padding: 10px 12px; }
+  .pcard .micro { font-size: 12px; }
+
+  /* trust strip and stats: tighter */
+  .trust div, .trust div + div { padding: 16px 12px 16px 0; }
+  .trust div:nth-child(even) { padding-left: 12px; }
+  .trust b { font-size: 17px; }
+  .trust span { font-size: 13px; }
+
+  /* forms */
+  .fs { padding: 16px 14px; }
+  .cards { gap: 10px; }
+  .opt-b { padding: 14px; }
+  .two { grid-template-columns: minmax(0, 1fr); }
+  .btn { width: 100%; justify-content: center; }
+  .btn.small, .gate-row .btn, .news .btn, .prow .btn { width: auto; }
+  .prow .btn { width: 100%; }
+  .neon .in { padding: 22px 18px; }
+  .neon h1, .neon h2 { font-size: calc(clamp(40px, 13vw, 56px) * var(--hs)); }
+  footer { gap: 24px; margin-top: 64px; }
+}
