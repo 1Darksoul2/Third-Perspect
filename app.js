@@ -144,6 +144,13 @@
     $("#more").innerHTML = left > 0 ? '<button class="btn ghost" type="button" data-more="1">Show ' + Math.min(PAGE, left) + " more (" + left + " left)</button>" : "";
     drawAll($("#grid"));
   }
+  function renderCatHead() {
+    var cat = state.cat === "all" ? null : cById(state.cat);
+    $("#tiles-cat").hidden = !!cat;
+    $("#cat-back").hidden = !cat;
+    $("#cat-title").textContent = cat ? cat.n : "The catalog";
+    $("#cat-desc").textContent = cat ? cat.d + "." : "Browse every design, printed to order. Pick a collection, or search by name.";
+  }
   function renderTiles() {
     $("#tiles-cat").innerHTML = tilesHTML(true);
     $("#tiles-home").innerHTML = tilesHTML(false);
@@ -300,14 +307,19 @@
   /* ---------- routing ---------- */
   var VIEWS = ["home", "catalog", "customize", "about", "contact", "login", "signup"];
   function route() {
-    var h = (location.hash || "#home").slice(1);
+    var parts = (location.hash || "#home").slice(1).split("/"), h = parts[0];
     if (VIEWS.indexOf(h) < 0) h = "home";
+    if (h === "catalog") {
+      /* #catalog shows every collection; #catalog/<id> shows that collection only */
+      var want = parts[1] && cById(parts[1]) ? parts[1] : "all";
+      if (want !== state.cat) { state.cat = want; state.sub = "All"; state.shown = PAGE; }
+    }
     state.view = h;
     VIEWS.forEach(function (v) { $("#view-" + v).hidden = v !== h; });
     $$("[data-nav]").forEach(function (a) { if (a.dataset.nav === h) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     closeAll(); setMenu(false);
     window.scrollTo(0, 0);
-    if (h === "catalog") { $$("[data-cat]", $("#tiles-cat")).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === state.cat); }); renderGrid(); }
+    if (h === "catalog") { $$("[data-cat]", $("#tiles-cat")).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === state.cat); }); renderCatHead(); renderGrid(); }
     requestAnimationFrame(function () { drawAll(); if (h === "customize") custUpdate(); if (h === "home") knotResize(); });
   }
 
@@ -398,9 +410,9 @@
     var sb = t.closest("[data-sub]"); if (sb) { state.sub = sb.dataset.sub; state.shown = PAGE; renderGrid(); return; }
     if (t.closest("[data-more]")) { state.shown += PAGE; renderGrid(); return; }
     var ag = t.closest("[data-age]");
-    if (ag) { if (ag.dataset.age === "yes") { state.adult = true; try { sessionStorage.setItem("tp-adult", "1"); } catch (e) {} renderGrid(); } else { state.cat = "all"; state.sub = "All"; route(); } return; }
+    if (ag) { if (ag.dataset.age === "yes") { state.adult = true; try { sessionStorage.setItem("tp-adult", "1"); } catch (e) {} renderGrid(); } else { location.hash = "#catalog"; } return; }
     var add = t.closest("[data-add]"); if (add) { e.stopPropagation(); addToCart(add.dataset.add); return; }
-    var tile = t.closest("[data-cat]"); if (tile) { state.cat = tile.dataset.cat; state.sub = "All"; state.shown = PAGE; if (state.view === "catalog") route(); else location.hash = "#catalog"; return; }
+    var tile = t.closest("[data-cat]"); if (tile) { location.hash = tile.dataset.cat === "all" ? "#catalog" : "#catalog/" + tile.dataset.cat; return; }
     var card = t.closest(".pcard"); if (card) { openModal(card.dataset.id); return; }
     if (t.closest("#open-cart")) { openCart(); return; }
     if (t.closest("#close-cart") || t.closest("#m-close") || t.id === "scrim") { closeAll(); return; }

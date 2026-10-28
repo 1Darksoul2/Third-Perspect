@@ -480,3 +480,7 @@ label.btn { cursor: pointer; }
 @media (max-width: 720px) {
   .hero-title { font-size: calc(clamp(36px, 13vw, 64px) * var(--hs)); padding-block: 84px 128px; }
 }
+
+/* catalog: back link when one collection is open */
+.back { display: inline-block; margin-bottom: 16px; font-size: 15px; color: var(--fg); }
+.back:hover { color: var(--accent); }
