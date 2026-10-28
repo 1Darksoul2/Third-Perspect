@@ -106,7 +106,7 @@
     var all = selectable ? '<button class="tile" type="button" data-cat="all" aria-pressed="' + (state.cat === "all") + '"><div><p class="micro">' + publicProducts().length + ' items</p><h3>Everything</h3><p>The full collection</p></div>' + cvHTML("vase", [196, 70, 56], .9, 40) + "</button>" : "";
     return all + CATS.map(function (c) {
       var n = PRODUCTS.filter(function (p) { return p.cat === c.id; }).length;
-      return '<button class="tile" type="button" data-cat="' + c.id + '" aria-pressed="' + (selectable && state.cat === c.id) + '"><div><p class="micro">' + n + ' items' + (c.adult ? " &middot; 18+" : "") + '</p><h3>' + c.n + "</h3><p>" + c.d + "</p></div>" + cvHTML(c.prof, c.c, .9, 40) + "</button>";
+      return '<button class="tile" type="button" data-cat="' + c.id + '" aria-pressed="' + (selectable && state.cat === c.id) + '"><div><p class="micro">' + n + ' items' + (c.adult ? ", 18+" : "") + '</p><h3>' + c.n + "</h3><p>" + c.d + "</p></div>" + cvHTML(c.prof, c.c, .9, 40) + "</button>";
     }).join("");
   }
   function cardHTML(p) {
@@ -167,7 +167,7 @@
     $("#subtotal").textContent = inr(sub);
     $("#items").innerHTML = state.cart.length ? state.cart.map(function (x, i) {
       var p = pById(x.id);
-      return '<div class="item">' + withShot(cvHTML(p.prof, COLORS[x.color].c, SIZES[x.size].s, 30), p) + "<div><h4>" + esc(p.n) + '</h4><span class="micro">' + SIZES[x.size].n + " &middot; " + COLORS[x.color].n + '</span><div class="qty"><button type="button" data-dec="' + i + '" aria-label="Fewer">&minus;</button><span>' + x.q + '</span><button type="button" data-inc="' + i + '" aria-label="More">+</button></div></div><div style="text-align:right"><div class="price">' + inr(lineTotal(x)) + '</div><button class="linkbtn" type="button" data-rm="' + i + '">Remove</button></div></div>';
+      return '<div class="item">' + withShot(cvHTML(p.prof, COLORS[x.color].c, SIZES[x.size].s, 30), p) + "<div><h4>" + esc(p.n) + '</h4><span class="micro">' + SIZES[x.size].n + ", " + COLORS[x.color].n + '</span><div class="qty"><button type="button" data-dec="' + i + '" aria-label="Fewer">&minus;</button><span>' + x.q + '</span><button type="button" data-inc="' + i + '" aria-label="More">+</button></div></div><div style="text-align:right"><div class="price">' + inr(lineTotal(x)) + '</div><button class="linkbtn" type="button" data-rm="' + i + '">Remove</button></div></div>';
     }).join("") : '<p class="note">Your cart is empty. Browse the catalog to add something.</p>';
     var left = Math.max(0, FREE - sub);
     $("#ship").innerHTML = (sub === 0 ? "Free shipping on orders over " + inr(FREE) : left > 0 ? "Add " + inr(left) + " more for free shipping" : "You have free shipping") + '<div class="bar"><i style="width:' + Math.min(100, sub / FREE * 100) + '%"></i></div>';
@@ -183,7 +183,7 @@
     var p = pById(id); mcur = { id: id, color: p.col, size: 1, qty: 1 };
     $("#sheet").innerHTML =
       '<div class="left">' + withShot(cvHTML(p.prof, COLORS[p.col].c, SIZES[1].s, 80).replace('<canvas', '<canvas id="m-cv"'), p) + "</div>" +
-      '<div class="right"><button class="iconbtn close" type="button" id="m-close">Close</button><span class="micro">' + cById(p.cat).n + (p.sub ? " &middot; " + p.sub : "") + "</span><h2>" + esc(p.n) + "</h2>" +
+      '<div class="right"><button class="iconbtn close" type="button" id="m-close">Close</button><span class="micro">' + cById(p.cat).n + (p.sub ? ", " + p.sub : "") + "</span><h2>" + esc(p.n) + "</h2>" +
       '<p style="color:var(--muted)">' + p.d + '</p><div class="meta micro"><span>' + p.mat + "</span><span>Print time " + p.t + "</span><span>Ships in 2 to 5 days</span></div>" +
       '<div><p class="micro" style="margin-bottom:8px">Colour: <span id="m-cn"></span></p><div class="chips" id="m-cols">' + COLORS.map(function (c, i) { return '<button class="sw" type="button" style="--c:' + hsl(c.c, 0) + '" data-mc="' + i + '" aria-label="' + c.n + '" aria-pressed="' + (i === p.col) + '"></button>'; }).join("") + "</div></div>" +
       '<div><p class="micro" style="margin-bottom:8px">Size</p><div class="chips" id="m-sizes">' + SIZES.map(function (s, i) { return '<button class="chip" type="button" data-ms="' + i + '" aria-pressed="' + (i === 1) + '">' + s.n + "</button>"; }).join("") + "</div></div>" +
@@ -245,7 +245,7 @@
     var types = ["All", "Production", "Prototyping", "Custom"];
     $("#proj-filter").innerHTML = types.map(function (t) { return '<button class="chip" type="button" data-pf="' + t + '" aria-pressed="' + (state.proj === t) + '">' + t + "</button>"; }).join("");
     $("#projects-grid").innerHTML = PROJECTS.filter(function (p) { return state.proj === "All" || p.type === state.proj; }).map(function (p) {
-      return '<article class="proj">' + cvHTML(p.prof, p.c, .8, 70) + '<div class="pb"><span class="micro">' + p.type + " &middot; " + p.who + "</span><h3>" + p.n + "</h3><p>" + p.d + '</p><div class="meta micro"><span>' + p.mat + "</span><span>" + p.qty + "</span><span>" + p.time + "</span></div></div></article>";
+      return '<article class="proj">' + cvHTML(p.prof, p.c, .8, 70) + '<div class="pb"><span class="micro">' + p.type + ", " + p.who + "</span><h3>" + p.n + "</h3><p>" + p.d + '</p><div class="meta micro"><span>' + p.mat + "</span><span>" + p.qty + "</span><span>" + p.time + "</span></div></div></article>";
     }).join("");
     drawAll($("#projects-grid"));
   }
