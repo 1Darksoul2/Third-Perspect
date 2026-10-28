@@ -104,7 +104,7 @@
 
   function tilesHTML(selectable) {
     var all = selectable ? '<button class="tile" type="button" data-cat="all" aria-pressed="' + (state.cat === "all") + '"><div><p class="micro">' + publicProducts().length + ' items</p><h3>Everything</h3><p>The full collection</p></div>' + cvHTML("vase", [196, 70, 56], .9, 40) + "</button>" : "";
-    return all + CATS.map(function (c) {
+    return all + CATS.filter(function (c) { return PRODUCTS.some(function (p) { return p.cat === c.id; }); }).map(function (c) {
       var n = PRODUCTS.filter(function (p) { return p.cat === c.id; }).length;
       return '<button class="tile" type="button" data-cat="' + c.id + '" aria-pressed="' + (selectable && state.cat === c.id) + '"><div><p class="micro">' + n + ' items' + (c.adult ? ", 18+" : "") + '</p><h3>' + c.n + "</h3><p>" + c.d + "</p></div>" + cvHTML(c.prof, c.c, .9, 40) + "</button>";
     }).join("");
@@ -154,7 +154,8 @@
   function renderTiles() {
     $("#tiles-cat").innerHTML = tilesHTML(true);
     $("#tiles-home").innerHTML = tilesHTML(false);
-    $("#best").innerHTML = publicProducts().filter(function (p) { return p.flag === "Popular"; }).slice(0, 4).map(cardHTML).join("");
+    var pub = publicProducts(), pop = pub.filter(function (p) { return p.flag === "Popular"; });
+    $("#best").innerHTML = pop.concat(pub.filter(function (p) { return p.flag !== "Popular"; })).slice(0, 4).map(cardHTML).join("");
     drawAll();
   }
 
