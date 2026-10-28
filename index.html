@@ -33,18 +33,17 @@
     <!-- HOME -->
     <div class="view" id="view-home">
       <section class="hero" id="hero">
-        <p class="micro tl">Made small<br>Printed to order<br>Shipped fast</p>
-        <h1 class="hero-title"><span class="w-l">Unbox</span><span class="w-gap">your</span><span class="w-r">unique</span></h1>
+        <p class="micro tl caps">Print on order</p>
+        <h1 class="hero-title"><span class="w-l">Third</span><span class="w-r">Perspect</span><span class="w-gap">Unbox your unique</span></h1>
         <div class="fallback" aria-hidden="true"></div>
         <canvas id="knot" aria-hidden="true"></canvas>
         <a class="explore" href="#catalog"><span aria-hidden="true">&rarr;</span>Explore<br>the catalog</a>
-        <p class="micro tr">Free shipping<br>over &#8377;999</p>
+        <p class="micro tr">Free shipping<br>over <span data-free>&#8377;1,999</span></p>
         <p class="micro vert">Custom orders open</p>
-        <p class="tagline">3D printed goods and custom orders</p>
       </section>
 
       <div class="trust">
-        <div><b>Free shipping</b><span>On orders over &#8377;999</span></div>
+        <div><b>Free shipping</b><span>On orders over <span data-free>&#8377;1,999</span></span></div>
         <div><b>2 to 5 days</b><span>From file check to dispatch</span></div>
         <div><b>Misprint promise</b><span>Free reprint within 7 days</span></div>
         <div><b>Secure payment</b><span>Cards, UPI and net banking</span></div>
@@ -115,9 +114,9 @@
             <div>
               <p class="micro">Custom order studio</p>
               <h1 style="margin-top:12px"><span class="l1">Design</span><span class="l2">your dream</span></h1>
-              <p>Set the size, material, colour and finish. The price updates as you go, and a person confirms it before anything is printed.</p>
+              <p>Tell us what you want made: your model, the print quality, material and colour. A person reviews every request and sends you a quote before anything is printed.</p>
             </div>
-            <div class="note" style="color:var(--neon-ink)">Prices shown are estimates for planning. We review your file and send a final quote within one working day.</div>
+            <div class="note" style="color:var(--neon-ink)">No automatic prices here. We confirm feasibility, any design charges and the final quote with you first.</div>
           </div>
         </div>
       </section>
@@ -126,62 +125,86 @@
         <form id="cform" novalidate>
           <fieldset class="fs">
             <legend>1. Your model</legend>
-            <div class="field full"><label class="l" for="c-file">Upload a file (STL, 3MF, STEP, OBJ)</label><input id="c-file" type="file" accept=".stl,.3mf,.step,.stp,.obj,.png,.jpg,.jpeg,.pdf"></div>
-            <p class="note" style="margin:10px 0 14px">No file yet? Describe it below and pick a stand-in shape for the preview. Sketches and photos are fine.</p>
+            <div class="field full"><label class="l" for="c-model">Model name <span class="req">(required)</span></label><input id="c-model" name="modelName" type="text" placeholder="Enter your model name" required aria-describedby="c-model-hint"><span class="note" id="c-model-hint">What should we call this design?</span></div>
+
+            <h3 class="sub-h" id="c-up-h">Upload Your Design</h3>
+            <p class="note" id="c-up-d">Upload your 3D model file or reference images. Image-to-3D design services may involve additional charges, which will be discussed over a phone call before proceeding.</p>
+            <div class="drop" id="c-drop">
+              <input id="c-file" class="vh" type="file" multiple accept=".stl,.obj,.3mf,.glb,.step,.stp,.png,.jpg,.jpeg" aria-labelledby="c-up-h" aria-describedby="c-up-d c-up-rules">
+              <p class="drop-t">Drag and drop files here, or</p>
+              <label class="btn ghost small" for="c-file">Browse files</label>
+              <p class="note" id="c-up-rules"></p>
+            </div>
+            <ul class="files" id="c-files" aria-live="polite"></ul>
+
+            <div class="notice" role="note">
+              <h3>Need a 3D model created from an image?</h3>
+              <p>Additional design charges may apply. Our team will discuss your requirements and confirm the charges with you over a phone call before starting the design.</p>
+              <p>Uploading a reference image does not include a finished 3D model and does not authorise any extra charge.</p>
+            </div>
+
+            <p class="note" style="margin:18px 0 10px">Preview shape (for the sketch on the right only):</p>
             <div class="chips" id="c-shape" role="group" aria-label="Preview shape"></div>
           </fieldset>
 
           <fieldset class="fs">
-            <legend>2. Material and colour</legend>
-            <div class="two">
-              <div class="field"><label class="l" for="c-mat">Material</label>
-                <select id="c-mat"><option>PLA</option><option>PETG</option><option>ABS / ASA</option><option>Nylon</option><option>TPU</option><option>Resin</option></select></div>
-              <div class="field"><label class="l" id="c-col-l">Colour: <span id="c-col-n">Aqua</span></label><div class="chips" id="c-col" role="group" aria-labelledby="c-col-l"></div></div>
-            </div>
-            <p class="note" id="c-mat-note" style="margin-top:12px"></p>
+            <legend>2. Print quality</legend>
+            <div class="cards" id="c-qual" role="radiogroup" aria-label="Print quality"></div>
           </fieldset>
 
           <fieldset class="fs">
-            <legend>3. Size and detail</legend>
+            <legend>3. Choose your material</legend>
+            <div class="cards" id="c-mat" role="radiogroup" aria-label="Material"></div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>4. Choose your colour</legend>
+            <p class="l" id="c-col-l">Selected: <span id="c-col-n"></span> <span class="note" id="c-col-s"></span></p>
+            <div class="chips swatches" id="c-col" role="radiogroup" aria-labelledby="c-col-l"></div>
+            <p class="note" style="margin-top:12px">A filled dot means in stock. Others are available on request and confirmed before printing. Exact colour matching and finish are confirmed after we check material and stock.</p>
+            <div class="field full" style="margin-top:14px"><label class="l" for="c-col-custom">Need a different shade? (optional)</label><input id="c-col-custom" name="customColour" type="text" placeholder="For example, Pantone 7621 C or 'match my sample'"></div>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>5. Size and finish</legend>
             <div class="field"><label class="l" for="c-size">Longest side</label>
-              <div class="range"><input id="c-size" type="range" min="20" max="300" step="5" value="120"><output id="c-size-o" for="c-size">120 mm</output></div></div>
+              <div class="range"><input id="c-size" name="size" type="range" min="20" max="300" step="5" value="120"><output id="c-size-o" for="c-size">120 mm</output></div></div>
             <div class="two" style="margin-top:16px">
-              <div class="field"><label class="l" for="c-qual">Print quality</label>
-                <select id="c-qual"><option>Draft</option><option selected>Standard</option><option>Fine</option><option>Ultra</option></select></div>
               <div class="field"><label class="l" for="c-fill">Strength</label>
-                <select id="c-fill"><option>Light</option><option selected>Standard</option><option>Solid</option></select></div>
-            </div>
-          </fieldset>
-
-          <fieldset class="fs">
-            <legend>4. Finish and quantity</legend>
-            <div class="two">
+                <select id="c-fill" name="strength"><option>Light</option><option selected>Standard</option><option>Solid</option></select></div>
               <div class="field"><label class="l" for="c-fin">Finish</label>
-                <select id="c-fin"><option>Raw</option><option>Sanded</option><option>Primed &amp; painted</option></select></div>
-              <div class="field"><label class="l" for="c-qty">Quantity</label><input id="c-qty" type="number" min="1" max="500" value="1"></div>
+                <select id="c-fin" name="finish"><option>Raw</option><option>Sanded</option><option>Primed &amp; painted</option></select></div>
+              <div class="field"><label class="l" for="c-qty">Quantity</label><input id="c-qty" name="quantity" type="number" min="1" max="500" value="1"></div>
             </div>
           </fieldset>
 
           <fieldset class="fs">
-            <legend>5. Your details</legend>
-            <div class="two">
-              <div class="field"><label class="l" for="c-name">Name</label><input id="c-name" type="text" autocomplete="name"></div>
-              <div class="field"><label class="l" for="c-email">Email</label><input id="c-email" type="email" autocomplete="email"></div>
-              <div class="field"><label class="l" for="c-phone">Phone</label><input id="c-phone" type="tel" autocomplete="tel"></div>
-              <div class="field"><label class="l" for="c-date">Needed by</label><input id="c-date" type="date"></div>
-              <div class="field full"><label class="l" for="c-notes">Tell us about it</label><textarea id="c-notes" rows="4" placeholder="What is it for? Any tolerances, text to engrave, logos, colours?"></textarea></div>
+            <legend>6. Special requirements</legend>
+            <div class="field full"><label class="l" for="c-notes">Describe your requirements (optional)</label><textarea id="c-notes" name="requirements" rows="5" placeholder="Dimensions, intended use, preferred finish, strength needs, assembly, text to engrave, or other instructions"></textarea></div>
+            <div class="two" style="margin-top:14px">
+              <div class="field"><label class="l" for="c-time">Preferred contact time (optional)</label>
+                <select id="c-time" name="contactTime"><option value="">Any time</option><option>Morning (9:30 to 12:00)</option><option>Afternoon (12:00 to 15:00)</option><option>Evening (15:00 to 18:30)</option></select></div>
+              <div class="field"><label class="l" for="c-date">Needed by (optional)</label><input id="c-date" name="neededBy" type="date"></div>
             </div>
-            <div style="margin-top:18px"><button class="btn" type="submit">Request my quote</button></div>
+            <p class="note" style="margin-top:12px">Complex requests may need a manual review before we can confirm them.</p>
+          </fieldset>
+
+          <fieldset class="fs">
+            <legend>7. Your details</legend>
+            <div class="two">
+              <div class="field"><label class="l" for="c-name">Name <span class="req">(required)</span></label><input id="c-name" name="name" type="text" autocomplete="name" required></div>
+              <div class="field"><label class="l" for="c-email">Email <span class="req">(required)</span></label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
+              <div class="field"><label class="l" for="c-phone">Phone <span class="req">(required)</span></label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="c-phone-hint"><span class="note" id="c-phone-hint">Only used to discuss this request.</span></div>
+            </div>
+            <div style="margin-top:18px"><button class="btn" type="submit" id="c-submit">Submit Customization Request</button></div>
             <p class="status" id="c-status" role="status"></p>
           </fieldset>
         </form>
 
-        <aside class="preview" aria-label="Preview and estimate">
-          <div class="cv"><canvas id="c-canvas" role="img" aria-label="Preview of your custom part"></canvas></div>
-          <dl class="bill" id="bill"></dl>
-          <div class="total"><span class="micro">Estimate</span><strong id="c-total">0</strong></div>
-          <p class="note" id="c-range"></p>
-          <p class="note" id="c-lead" style="margin-top:6px"></p>
+        <aside class="preview" aria-label="Preview">
+          <div class="cv"><canvas id="c-canvas" role="img" aria-label="Sketch of your custom part"></canvas></div>
+          <dl class="bill" id="c-summary"></dl>
+          <p class="note" style="margin-top:12px">The sketch is only a stand-in. Your final quote comes from our team after review.</p>
         </aside>
       </div>
     </div>
@@ -246,7 +269,7 @@
         <details open><summary>How long does an order take?</summary><p>Catalog items ship in 2 to 5 working days. Custom orders depend on size and quantity, and the quote shows an estimate.</p></details>
         <details><summary>Which files can I send?</summary><p>STL, 3MF, STEP and OBJ work best. Sketches and photos are fine too, and we can model them for an hourly fee.</p></details>
         <details><summary>What if my part prints wrong?</summary><p>If a print has a fault that is ours, we reprint it free within 7 days of delivery.</p></details>
-        <details><summary>Do you ship across the country?</summary><p>Yes. Shipping is free over &#8377;999, and bulk orders can be sent by freight.</p></details>
+        <details><summary>Do you ship across the country?</summary><p>Yes. Shipping is free on orders of <span data-free>&#8377;1,999</span> or more, and bulk orders can be sent by freight.</p></details>
       </section>
     </div>
     <!-- LOGIN -->

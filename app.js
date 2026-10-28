@@ -3,7 +3,7 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var inr = function (n) { return "\u20b9" + Math.round(n).toLocaleString("en-IN"); };
-  var FREE = (window.SHOP && SHOP.freeShipping) || 999;
+  var FREE = (window.SHOP && SHOP.freeShipping) || 1999;
   var PAGE = 24;
 
   /* ---------- data ---------- */
@@ -201,43 +201,67 @@
     drawObj($("#m-cv"), P[p.prof], { layers: 80, c: COLORS[mcur.color].c, scale: SIZES[mcur.size].s });
   }
 
-  /* ---------- customize ---------- */
-  var MAT = { "PLA": { r: 3.5, d: 1.24, n: "Easy, colourful and great for display pieces." }, "PETG": { r: 4, d: 1.27, n: "Tough, slightly glossy and fine around water." }, "ABS / ASA": { r: 4.5, d: 1.05, n: "Handles heat and sun. Good for outdoor parts." }, "Nylon": { r: 8, d: 1.14, n: "Strong and slippery. Best for gears and hinges." }, "TPU": { r: 6.5, d: 1.21, n: "Flexible and rubber-like for grips and seals." }, "Resin": { r: 11, d: 1.1, n: "Very fine detail with a glass-smooth surface." } };
-  var QUAL = { Draft: { lh: "0.28 mm", m: .85 }, Standard: { lh: "0.20 mm", m: 1 }, Fine: { lh: "0.12 mm", m: 1.35 }, Ultra: { lh: "0.08 mm", m: 1.8 } };
-  var FILL = { Light: .2, Standard: .3, Solid: .5 };
-  var FIN = { "Raw": 0, "Sanded": 120, "Primed & painted": 450 };
+  /* ---------- customize: a request form, no automatic price ---------- */
+  var MATS = window.MATERIALS || [], QUALS = window.QUALITIES || [], CCOLS = window.CUSTOM_COLORS || [];
   var SHAPES = [["vase", "Vase"], ["pawn", "Chess piece"], ["knob", "Knob"], ["tower", "Tower"], ["drop", "Pendant"]];
-  var cust = { shape: "vase", color: 0 };
+  var MAX_MB = (window.SHOP && SHOP.maxUploadMB) || 50, MAX_FILES = (window.SHOP && SHOP.maxFiles) || 5;
+  var EXT3D = ["stl", "obj", "3mf", "glb", "step", "stp"], EXTIMG = ["png", "jpg", "jpeg"];
+  var firstMat = MATS.filter(function (m) { return m.available === true; })[0];
+  var cust = { shape: "vase", color: 0, qual: QUALS.length ? QUALS[0].id : "", mat: firstMat ? firstMat.id : "", files: [] };
+  function availText(a) { return a === true ? "Available" : a === "request" ? "On request, confirmed after review" : "Currently unavailable"; }
+  function cardHTML2(group, id, title, body, checked, disabled, extra) {
+    return '<label class="opt' + (disabled ? " off" : "") + '"><input type="radio" name="' + group + '" value="' + esc(id) + '"' + (checked ? " checked" : "") + (disabled ? " disabled" : "") + '><span class="opt-b"><b>' + esc(title) + "</b>" + body + (extra || "") + "</span></label>";
+  }
   function buildCustomizer() {
     $("#c-shape").innerHTML = SHAPES.map(function (s) { return '<button class="chip" type="button" data-shape="' + s[0] + '" aria-pressed="' + (s[0] === cust.shape) + '">' + s[1] + "</button>"; }).join("");
-    $("#c-col").innerHTML = COLORS.map(function (c, i) { return '<button class="sw" type="button" style="--c:' + hsl(c.c, 0) + '" data-cc="' + i + '" aria-label="' + c.n + '" aria-pressed="' + (i === cust.color) + '"></button>'; }).join("");
+    $("#c-qual").innerHTML = QUALS.map(function (q) {
+      return cardHTML2("quality", q.id, q.n, "<span>" + esc(q.d) + '</span><span class="note">' + esc(q.trade) + "</span>", q.id === cust.qual, false);
+    }).join("");
+    $("#c-mat").innerHTML = MATS.map(function (m) {
+      var off = m.available !== true && m.available !== "request";
+      return cardHTML2("material", m.id, m.n, "<span>" + esc(m.d) + '</span><span class="note"><b>Good for:</b> ' + esc(m.use) + '</span><span class="note"><b>Traits:</b> ' + esc(m.traits) + '</span><span class="note"><b>Limits:</b> ' + esc(m.limit) + "</span>", m.id === cust.mat, off, '<span class="avail' + (m.available === true ? " ok" : "") + '">' + availText(m.available) + "</span>");
+    }).join("");
+    $("#c-col").innerHTML = CCOLS.map(function (c, i) {
+      return '<button class="sw' + (c.stock ? " stock" : "") + '" type="button" role="radio" style="--c:' + hsl(c.c, 0) + '" data-cc="' + i + '" aria-label="' + esc(c.n) + (c.stock ? ", in stock" : ", on request") + '" aria-checked="' + (i === cust.color) + '" tabindex="' + (i === cust.color ? 0 : -1) + '"></button>';
+    }).join("");
+    $("#c-up-rules").textContent = "Accepted: 3D files (" + EXT3D.join(", ").toUpperCase() + ") and images (" + EXTIMG.join(", ").toUpperCase() + "). Up to " + MAX_FILES + " files, " + MAX_MB + " MB each.";
+    renderFiles();
     custUpdate();
   }
   function custUpdate() {
-    var size = +$("#c-size").value, mat = $("#c-mat").value, qual = $("#c-qual").value, fill = $("#c-fill").value, fin = $("#c-fin").value;
+    var size = +$("#c-size").value, col = CCOLS[cust.color];
     var qty = Math.max(1, Math.min(500, parseInt($("#c-qty").value, 10) || 1));
     $("#c-size-o").textContent = size + " mm";
-    $("#c-col-n").textContent = COLORS[cust.color].n;
-    $("#c-mat-note").textContent = MAT[mat].n;
+    if (col) { $("#c-col-n").textContent = col.n; $("#c-col-s").textContent = col.stock ? "(in stock)" : "(on request)"; }
     $$("[data-shape]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.shape === cust.shape); });
-    $$("[data-cc]").forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.cc === cust.color); });
-    var vol = Math.pow(size / 10, 3) * .12, grams = vol * MAT[mat].d * FILL[fill];
-    var hours = grams / 14 * QUAL[qual].m, mcost = grams * MAT[mat].r, tcost = hours * 60, unit = mcost + tcost + FIN[fin];
-    var disc = qty >= 50 ? .2 : qty >= 25 ? .15 : qty >= 10 ? .1 : qty >= 5 ? .05 : 0;
-    var total = unit * qty * (1 - disc) + 199;
-    var lo = Math.round(total * .85 / 10) * 10, hi = Math.round(total * 1.15 / 10) * 10;
-    var days = 2 + Math.ceil(hours * qty / 20);
-    $("#bill").innerHTML =
-      "<div><dt>Material (" + Math.round(grams) + " g)</dt><dd>" + inr(mcost) + "</dd></div>" +
-      "<div><dt>Machine time (" + hours.toFixed(1) + " h, " + QUAL[qual].lh + ")</dt><dd>" + inr(tcost) + "</dd></div>" +
-      "<div><dt>Finish: " + fin + "</dt><dd>" + inr(FIN[fin]) + "</dd></div>" +
-      "<div><dt>Per piece</dt><dd>" + inr(unit) + "</dd></div>" +
-      "<div><dt>Quantity</dt><dd>&times; " + qty + (disc ? " (" + Math.round(disc * 100) + "% off)" : "") + "</dd></div>" +
-      "<div><dt>Setup, once per order</dt><dd>" + inr(199) + "</dd></div>";
-    $("#c-total").textContent = inr(total);
-    $("#c-range").textContent = "Likely range " + inr(lo) + " to " + inr(hi) + " after we review your file.";
-    $("#c-lead").textContent = "Estimated lead time: " + days + " to " + (days + 2) + " working days.";
-    drawObj($("#c-canvas"), P[cust.shape], { layers: 90, c: COLORS[cust.color].c, scale: .4 + .6 * (size / 300) });
+    $$("[data-cc]").forEach(function (b) { var on = +b.dataset.cc === cust.color; b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1; });
+    var m = MATS.filter(function (x) { return x.id === cust.mat; })[0];
+    var rows = [["Model", $("#c-model").value.trim() || "Not named yet"], ["Files", cust.files.length ? cust.files.length + " selected" : "None yet"], ["Quality", cust.qual || "-"], ["Material", m ? m.n : "-"], ["Colour", col ? col.n : "-"], ["Size", size + " mm, " + $("#c-fin").value], ["Quantity", qty]];
+    $("#c-summary").innerHTML = rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("");
+    if (col) drawObj($("#c-canvas"), P[cust.shape], { layers: 90, c: col.c, scale: .4 + .6 * (size / 300) });
+  }
+  function extOf(name) { var i = name.lastIndexOf("."); return i < 0 ? "" : name.slice(i + 1).toLowerCase(); }
+  function fmtSize(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; }
+  function addFiles(list) {
+    var errs = [];
+    Array.prototype.forEach.call(list, function (f) {
+      var ext = extOf(f.name), kind = EXT3D.indexOf(ext) > -1 ? "3D file" : EXTIMG.indexOf(ext) > -1 ? "Image" : "";
+      if (!kind) { errs.push(f.name + " is not an accepted file type."); return; }
+      if (f.size > MAX_MB * 1048576) { errs.push(f.name + " is larger than " + MAX_MB + " MB."); return; }
+      if (!f.size) { errs.push(f.name + " is empty."); return; }
+      if (cust.files.some(function (x) { return x.file.name === f.name && x.file.size === f.size; })) return;
+      if (cust.files.length >= MAX_FILES) { errs.push("Up to " + MAX_FILES + " files per request. " + f.name + " was not added."); return; }
+      cust.files.push({ file: f, kind: kind, status: "Ready to send" });
+    });
+    $("#c-file").value = "";
+    renderFiles();
+    custUpdate();
+    setStatus("#c-status", errs.join(" "), errs.length > 0);
+  }
+  function renderFiles() {
+    $("#c-files").innerHTML = cust.files.map(function (x, i) {
+      return '<li><span class="fn">' + esc(x.file.name) + '</span><span class="note">' + x.kind + " (" + esc(extOf(x.file.name).toUpperCase()) + "), " + fmtSize(x.file.size) + '</span><span class="note fs-st">' + esc(x.status) + '</span><button type="button" class="linkbtn" data-rmfile="' + i + '" aria-label="Remove ' + esc(x.file.name) + '">Remove</button></li>';
+    }).join("");
   }
 
   /* ---------- projects ---------- */
@@ -259,6 +283,8 @@
     if (mq.matches) br.setAttribute("aria-expanded", open ? "true" : "false"); else br.removeAttribute("aria-expanded");
   }
   if (mq.addEventListener) mq.addEventListener("change", function () { setMenu(false); });
+
+  $$("[data-free]").forEach(function (el) { el.textContent = inr(FREE); });
 
   /* ---------- font switcher ---------- */
   var FONTS = [["soft", "Soft serif"], ["editorial", "Editorial"], ["modern", "Modern"]];
@@ -304,8 +330,8 @@
       g.fillStyle = "rgba(255,255,255,.96)"; g.fillRect(110, 80, 90, 160); g.fillRect(430, 50, 170, 64); g.fillRect(770, 100, 70, 180);
       g.fillStyle = "rgba(255,150,50,.9)"; g.fillRect(620, 190, 120, 42); g.fillStyle = "rgba(100,200,255,.85)"; g.fillRect(260, 210, 90, 36);
       var env = new T.CanvasTexture(ec); env.mapping = T.EquirectangularReflectionMapping; env.encoding = T.sRGBEncoding;
-      var chrome = new T.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: .12, envMap: env, envMapIntensity: 1.3 });
-      var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: .25, roughness: .42, envMap: env, envMapIntensity: .45 });
+      var chrome = new T.MeshStandardMaterial({ color: 0xffffff, metalness: .6, roughness: .5, envMap: env, envMapIntensity: .55 });
+      var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: 0, roughness: .85, envMap: env, envMapIntensity: .1 });
       var R = 1.2, H = .22, group = new T.Group();
       var rim = new T.Mesh(new T.CylinderGeometry(R, R, H, 96, 1, true), chrome); rim.rotation.x = Math.PI / 2; group.add(rim);
       var tg = new T.TorusGeometry(R, .08, 24, 120);
@@ -316,7 +342,7 @@
       var back = new T.Mesh(dg, face); back.position.z = -H / 2 - .003; back.rotation.y = Math.PI; group.add(back);
       scene.add(group);
       scene.add(new T.AmbientLight(0xffffff, .95));
-      var dl = new T.DirectionalLight(0xffffff, .9); dl.position.set(2, 3, 5); scene.add(dl);
+      var dl = new T.DirectionalLight(0xffffff, .5); dl.position.set(2, 3, 5); scene.add(dl);
       new T.TextureLoader().load(LOGO_HI, function (lt) {
         lt.encoding = T.sRGBEncoding; lt.anisotropy = renderer.capabilities.getMaxAnisotropy();
         face.map = lt; face.color.set(0xffffff); face.needsUpdate = true;
@@ -381,12 +407,13 @@
     var mc = t.closest("[data-mc]"); if (mc) { mcur.color = +mc.dataset.mc; modalUpdate(); return; }
     var ms = t.closest("[data-ms]"); if (ms) { mcur.size = +ms.dataset.ms; modalUpdate(); return; }
     if (t.closest("#m-add")) { addToCart(mcur.id, { color: mcur.color, size: mcur.size }); closeAll(); openCart(); return; }
-    if (t.closest("#m-cust")) { var pr = pById(mcur.id); cust.shape = SHAPES.some(function (s) { return s[0] === pr.prof; }) ? pr.prof : cust.shape; cust.color = mcur.color; closeAll(); location.hash = "#customize"; setTimeout(buildCustomizer, 0); return; }
+    if (t.closest("#m-cust")) { var pr = pById(mcur.id); cust.shape = SHAPES.some(function (s) { return s[0] === pr.prof; }) ? pr.prof : cust.shape; closeAll(); location.hash = "#customize"; setTimeout(buildCustomizer, 0); return; }
     var inc = t.closest("[data-inc]"); if (inc) { state.cart[+inc.dataset.inc].q++; saveCart(); renderCart(); return; }
     var dec = t.closest("[data-dec]"); if (dec) { var it = state.cart[+dec.dataset.dec]; it.q--; if (it.q < 1) state.cart.splice(+dec.dataset.dec, 1); saveCart(); renderCart(); return; }
     var rm = t.closest("[data-rm]"); if (rm) { state.cart.splice(+rm.dataset.rm, 1); saveCart(); renderCart(); return; }
     var sh = t.closest("[data-shape]"); if (sh) { cust.shape = sh.dataset.shape; custUpdate(); return; }
     var cc = t.closest("[data-cc]"); if (cc) { cust.color = +cc.dataset.cc; custUpdate(); return; }
+    var rf = t.closest("[data-rmfile]"); if (rf) { cust.files.splice(+rf.dataset.rmfile, 1); renderFiles(); custUpdate(); $("#c-file").focus(); return; }
     var pf = t.closest("[data-pf]"); if (pf) { state.proj = pf.dataset.pf; renderProjects(); return; }
     if (t.closest("#checkout")) { $("#co-status").textContent = "Template checkout. Connect your payment provider to take real orders."; return; }
     if (t.closest('[data-act="theme"]')) {
@@ -404,16 +431,60 @@
 
   $("#q").addEventListener("input", function (e) { state.q = e.target.value.trim().toLowerCase(); state.shown = PAGE; renderGrid(); });
   $("#sort").addEventListener("change", function (e) { state.sort = e.target.value; state.shown = PAGE; renderGrid(); });
-  ["c-size", "c-mat", "c-qual", "c-fill", "c-fin", "c-qty"].forEach(function (id) { $("#" + id).addEventListener("input", custUpdate); $("#" + id).addEventListener("change", custUpdate); });
+  ["c-size", "c-fill", "c-fin", "c-qty", "c-model"].forEach(function (id) { $("#" + id).addEventListener("input", custUpdate); $("#" + id).addEventListener("change", custUpdate); });
+  $("#cform").addEventListener("change", function (e) {
+    if (e.target.name === "quality") { cust.qual = e.target.value; custUpdate(); }
+    if (e.target.name === "material") { cust.mat = e.target.value; custUpdate(); }
+  });
+  $("#c-file").addEventListener("change", function (e) { addFiles(e.target.files); });
+  (function () {
+    var dz = $("#c-drop");
+    ["dragenter", "dragover"].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add("over"); }); });
+    ["dragleave", "drop"].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove("over"); }); });
+    dz.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); });
+  })();
+  $("#c-col").addEventListener("keydown", function (e) {
+    var k = e.key, n = CCOLS.length;
+    if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].indexOf(k) < 0) return;
+    e.preventDefault();
+    cust.color = (cust.color + (k === "ArrowRight" || k === "ArrowDown" ? 1 : n - 1)) % n;
+    custUpdate(); $('[data-cc="' + cust.color + '"]').focus();
+  });
 
   function setStatus(sel, msg, err) { var el = $(sel); el.textContent = msg; el.classList.toggle("err", !!err); }
   function bad(el, msg, st) { setStatus(st, msg, true); el.focus(); }
   function okEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function okPhone(v) { var d = v.replace(/[\s()+-]/g, ""); return /^\d{10,13}$/.test(d); }
   $("#cform").addEventListener("submit", function (e) {
     e.preventDefault();
+    if (!$("#c-model").value.trim()) return bad($("#c-model"), "Add a model name so we can track your request.", "#c-status");
+    if (!cust.files.length) return bad($("#c-file"), "Upload at least one 3D file or reference image.", "#c-status");
+    if (!cust.mat) return bad($("#c-mat"), "Choose a material.", "#c-status");
     if (!$("#c-name").value.trim()) return bad($("#c-name"), "Add your name so we know who to reply to.", "#c-status");
     if (!okEmail($("#c-email").value.trim())) return bad($("#c-email"), "Add a valid email so we can send the quote.", "#c-status");
-    setStatus("#c-status", "Template form: connect it to your email or order system to receive real requests.", false);
+    if (!okPhone($("#c-phone").value.trim())) return bad($("#c-phone"), "Add a phone number with 10 to 13 digits so we can call you about the request.", "#c-status");
+    var url = window.SHOP && SHOP.customOrderEndpoint;
+    if (!url) return setStatus("#c-status", "Online requests are not connected yet, so nothing was sent. Please contact us by email or phone for now.", true);
+    var fd = new FormData($("#cform"));
+    fd.delete("quality"); fd.delete("material");
+    fd.append("quality", cust.qual); fd.append("material", cust.mat);
+    fd.append("colour", CCOLS[cust.color] ? CCOLS[cust.color].n : "");
+    fd.append("colourInStock", CCOLS[cust.color] && CCOLS[cust.color].stock ? "yes" : "no");
+    fd.append("previewShape", cust.shape);
+    cust.files.forEach(function (x) { fd.append("files", x.file, x.file.name); x.status = "Uploading..."; });
+    renderFiles();
+    var btn = $("#c-submit"); btn.disabled = true;
+    setStatus("#c-status", "Sending your request...", false);
+    fetch(url, { method: "POST", body: fd, headers: { "Accept": "application/json" } }).then(function (r) {
+      if (!r.ok) throw new Error("status " + r.status);
+      cust.files.forEach(function (x) { x.status = "Uploaded"; });
+      renderFiles();
+      setStatus("#c-status", "Your customization request has been submitted. Our team will review your requirements and contact you to confirm feasibility, any additional design charges, and the final quote before proceeding.", false);
+    }).catch(function () {
+      cust.files.forEach(function (x) { x.status = "Not sent"; });
+      renderFiles();
+      setStatus("#c-status", "We could not send your request. Nothing was submitted. Check your connection and try again, or contact us by email or phone.", true);
+    }).then(function () { btn.disabled = false; });
   });
   $("#kform").addEventListener("submit", function (e) {
     e.preventDefault();

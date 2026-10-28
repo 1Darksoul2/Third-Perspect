@@ -10,10 +10,61 @@
    ============================================================ */
 var SHOP = {
   name: "Third Perspect",
-  freeShipping: 999,        /* free shipping above this amount, in rupees */
+  freeShipping: 1999,       /* orders of this amount or more ship free, in rupees */
   useImages: false,         /* set to true once photos are in images/ */
-  imageBase: "images/"
+  imageBase: "images/",
+  /* Custom order requests. Set customOrderEndpoint to the URL of your order
+     system or form service (it receives a multipart POST). While it is null
+     the Customize form validates but sends nothing, and says so. */
+  customOrderEndpoint: null,
+  maxUploadMB: 50,          /* per file; must match what your backend accepts */
+  maxFiles: 5
 };
+
+/* ============================================================
+   CUSTOM ORDERS: materials, colours and print quality
+   Edit these to match what the workshop actually runs.
+   available: true  = offered now
+              false = shown as unavailable and cannot be picked
+              "request" = can be asked for, confirmed after review
+   ============================================================ */
+var MATERIALS = [
+  {"id": "PLA", "n": "PLA", "d": "Easy to print, wide colour range, good surface finish.", "use": "Decor, display pieces, prototypes", "traits": "Rigid, matte to satin finish, low heat resistance", "limit": "Softens in hot cars and direct sun", "available": true},
+  {"id": "PETG", "n": "PETG", "d": "Tougher than PLA and slightly glossy.", "use": "Functional parts, outdoor holders, kitchen tools", "traits": "Impact resistant, handles moisture, moderate heat", "limit": "Fine detail is a little softer than PLA", "available": true},
+  {"id": "ABS", "n": "ABS / ASA", "d": "For parts that need to handle heat or sunlight.", "use": "Car parts, outdoor fittings, enclosures", "traits": "Heat resistant, durable, can be sanded", "limit": "Printed in a controlled enclosure; fewer colours", "available": true},
+  {"id": "Nylon", "n": "Nylon", "d": "Strong and slightly slippery.", "use": "Gears, hinges, clips", "traits": "High strength, wear resistant", "limit": "Limited colours; absorbs moisture", "available": true},
+  {"id": "TPU", "n": "TPU", "d": "Flexible, rubber-like filament.", "use": "Grips, seals, phone cases, bumpers", "traits": "Flexible, shock absorbing", "limit": "Slow to print; no sharp fine detail", "available": true},
+  {"id": "Resin", "n": "Resin", "d": "Liquid resin cured by light, not a filament.", "use": "Miniatures, jewellery masters, very fine detail", "traits": "Very fine detail, smooth surface", "limit": "Brittle; small build size; confirmed per job", "available": "request"}
+];
+
+var QUALITIES = [
+  {"id": "Standard", "n": "Standard", "d": "Suitable for everyday objects and prototypes.", "trade": "Fastest to print and lowest cost. Layer lines are visible up close."},
+  {"id": "Fine", "n": "Fine", "d": "Higher detail and smoother visible surfaces.", "trade": "Takes longer to print and may cost more than Standard."},
+  {"id": "High Detail", "n": "High Detail", "d": "For intricate models and detailed finishes.", "trade": "Slowest to print and usually the highest cost. Best for small, detailed parts."}
+];
+
+/* c is [hue, saturation %, lightness %]. stock: true = in stock now;
+   false = available on request, we confirm before printing. */
+var CUSTOM_COLORS = [
+  {"n": "Black", "c": [0, 0, 10], "stock": false},
+  {"n": "White", "c": [40, 20, 95], "stock": false},
+  {"n": "Grey", "c": [0, 0, 55], "stock": false},
+  {"n": "Silver", "c": [210, 8, 75], "stock": false},
+  {"n": "Red", "c": [2, 78, 48], "stock": false},
+  {"n": "Orange", "c": [24, 92, 54], "stock": false},
+  {"n": "Yellow", "c": [48, 95, 55], "stock": false},
+  {"n": "Lime", "c": [84, 65, 50], "stock": false},
+  {"n": "Green", "c": [140, 55, 36], "stock": false},
+  {"n": "Teal", "c": [178, 60, 38], "stock": false},
+  {"n": "Sky blue", "c": [198, 78, 60], "stock": false},
+  {"n": "Blue", "c": [218, 72, 45], "stock": false},
+  {"n": "Navy", "c": [224, 55, 24], "stock": false},
+  {"n": "Purple", "c": [272, 50, 46], "stock": false},
+  {"n": "Pink", "c": [334, 78, 72], "stock": false},
+  {"n": "Brown", "c": [24, 42, 32], "stock": false},
+  {"n": "Beige", "c": [36, 40, 76], "stock": false},
+  {"n": "Gold", "c": [44, 70, 52], "stock": false}
+];
 
 var CATS = [
   {"id": "lamps", "n": "Lamps & Lighting", "d": "Dragon, designer and kids\u2019 lamps", "prof": "lamp", "c": [18, 88, 56], "subs": ["Fire & fantasy", "Designer lamps", "Themed & kids", "Switches & plates"]},
