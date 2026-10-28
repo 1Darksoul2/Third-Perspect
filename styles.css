@@ -189,7 +189,7 @@
   .steps p { color: var(--muted); font-size: 15px; }
 
   /* customize */
-  .cust { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 36px; align-items: start; margin-top: 44px; }
+  .cust { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; align-items: start; margin-top: 44px; }
   .fs { border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin: 0 0 18px; min-width: 0; }
   .fs legend { font: 500 13px var(--sans); color: var(--accent); padding: 0 8px; }
   .fs h3 { font-size: 24px; font-style: var(--ital); margin: 0 0 14px; }
