@@ -341,7 +341,7 @@
       g.fillStyle = "rgba(255,255,255,.96)"; g.fillRect(110, 80, 90, 160); g.fillRect(430, 50, 170, 64); g.fillRect(770, 100, 70, 180);
       g.fillStyle = "rgba(255,150,50,.9)"; g.fillRect(620, 190, 120, 42); g.fillStyle = "rgba(100,200,255,.85)"; g.fillRect(260, 210, 90, 36);
       var env = new T.CanvasTexture(ec); env.mapping = T.EquirectangularReflectionMapping; env.encoding = T.sRGBEncoding;
-      var chrome = new T.MeshStandardMaterial({ color: 0x0b0b0b, metalness: .35, roughness: .42, envMap: env, envMapIntensity: .22 });
+      var chrome = new T.MeshStandardMaterial({ color: 0x030303, metalness: .55, roughness: .3, envMap: env, envMapIntensity: .3 });
       var face = new T.MeshStandardMaterial({ color: 0x1a1512, metalness: 0, roughness: .85, envMap: env, envMapIntensity: .1 });
       var R = 1.2, H = .22, group = new T.Group();
       var rim = new T.Mesh(new T.CylinderGeometry(R, R, H, 96, 1, true), chrome); rim.rotation.x = Math.PI / 2; group.add(rim);
