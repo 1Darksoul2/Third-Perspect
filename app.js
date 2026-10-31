@@ -147,6 +147,7 @@
   function renderCatHead() {
     var cat = state.cat === "all" ? null : cById(state.cat);
     $("#tiles-cat").hidden = !!cat;
+    $("#view-catalog").classList.toggle("in-cat", !!cat);
     $("#cat-back").hidden = !cat;
     $("#cat-title").textContent = cat ? cat.n : "The catalog";
     $("#cat-desc").textContent = cat ? cat.d + "." : "Browse every design, printed to order. Pick a collection, or search by name.";
